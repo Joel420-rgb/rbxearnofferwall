@@ -45,11 +45,30 @@
     .image-row img {
       width: 120px;
     }
+    #auth {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 60vh;
+    }
+    #auth h2 {
+      margin-bottom: 1rem;
+    }
+    #auth button {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      cursor: pointer;
+      background-color: #000;
+      color: #fff;
+      border: none;
+      border-radius: 0.5rem;
+    }
   </style>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBPzy5gI_8pYNAf6MfPAhynXFUQmoIyX0Q",
@@ -63,8 +82,11 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth();
     const db = getFirestore(app);
-
     const provider = new GoogleAuthProvider();
+
+    function generateSecureHash(uid) {
+      return CryptoJS.MD5(uid + '-Fw6OCES5xait8uFo59OukB2M5aENR2Qj').toString();
+    }
 
     async function signIn() {
       const result = await signInWithPopup(auth, provider);
@@ -79,13 +101,18 @@
           balance: 0
         });
       }
+
       showDashboard(user);
     }
 
     function showDashboard(user) {
+      const secureHash = generateSecureHash(user.uid);
       document.getElementById("auth").style.display = "none";
       document.getElementById("dashboard").style.display = "block";
-      document.getElementById("iframe-cpx").src = `https://offers.cpx-research.com/index.php?app_id=27501&ext_user_id=${user.uid}&secure_hash=${md5(user.uid + '-Fw6OCES5xait8uFo59OukB2M5aENR2Qj')}&username=${user.displayName}&email=${user.email}`;
+
+      const iframeSrc = `https://offers.cpx-research.com/index.php?app_id=27501&ext_user_id=${user.uid}&secure_hash=${secureHash}&username=${encodeURIComponent(user.displayName)}&email=${encodeURIComponent(user.email)}`;
+
+      document.getElementById("iframe-cpx").src = iframeSrc;
       document.getElementById("referral-link").textContent = `${window.location.origin}/?ref=${user.uid}`;
     }
 
@@ -96,17 +123,13 @@
     });
 
     window.signIn = signIn;
-
-    function md5(string) {
-      return CryptoJS.MD5(string).toString();
-    }
   </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 </head>
 <body>
   <header>RBX EARN</header>
   <div class="container">
-    <div id="auth" style="text-align: center">
+    <div id="auth">
       <h2>Login to Start Earning Robux</h2>
       <button onclick="signIn()">Sign in with Google</button>
     </div>
@@ -139,35 +162,3 @@
   </div>
 </body>
 </html>
-
-<!-- BACKEND POSTBACK EXAMPLE (Node.js) -->
-// File: /api/postback.js (for Vercel or Firebase Functions)
-/*
-export default async function handler(req, res) {
-  const admin = await import("firebase-admin");
-
-  if (!admin.apps.length) {
-    admin.initializeApp({
-      credential: admin.credential.cert({
-        projectId: "offerwall-a1633",
-        clientEmail: "YOUR_FIREBASE_ADMIN_EMAIL",
-        privateKey: "YOUR_FIREBASE_PRIVATE_KEY".replace(/\\n/g, '\n')
-      })
-    });
-  }
-
-  const db = admin.firestore();
-  const { user_id, amount, hash } = req.query;
-  const expectedHash = require("crypto").createHash("md5").update(user_id + "-Fw6OCES5xait8uFo59OukB2M5aENR2Qj").digest("hex");
-
-  if (hash !== expectedHash) return res.status(403).send("Invalid hash");
-
-  await db.collection("users").doc(user_id).update({
-    balance: admin.firestore.FieldValue.increment(parseInt(amount))
-  });
-
-  res.status(200).send("Balance updated");
-}
-*/
-// Set this as your CPX postback URL:
-// https://your-app-url.vercel.app/api/postback?user_id=UID&amount=AMOUNT&hash=SECURE_HASH
