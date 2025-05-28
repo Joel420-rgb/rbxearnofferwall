@@ -12,7 +12,6 @@
     background: linear-gradient(135deg, #00ff00, #005500);
     color: #00ff00;
     margin: 0; padding: 0;
-    overflow-x: hidden;
   }
   header {
     background: #003300;
@@ -24,7 +23,6 @@
     color: #00ff00;
     position: relative;
     text-shadow: 0 0 10px #00ff00;
-    animation: fadeInDown 1s ease forwards;
   }
   #logout-btn {
     position: absolute;
@@ -39,7 +37,6 @@
     color: #003300;
     display: none;
     box-shadow: 0 0 8px #00ff00;
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
   }
   #logout-btn:hover {
     background: #00ff00;
@@ -53,24 +50,17 @@
     border-radius: 16px;
     padding: 25px;
     box-shadow: 0 0 30px #00ff00;
-    animation: fadeIn 1.2s ease forwards;
   }
   section {
     margin-bottom: 35px;
-    opacity: 0;
-    animation: fadeInUp 1s ease forwards;
   }
-  section:nth-child(2) { animation-delay: 0.3s; }
-  section:nth-child(3) { animation-delay: 0.6s; }
-  section:nth-child(4) { animation-delay: 0.9s; }
   h2 {
     border-bottom: 3px solid #00ff00;
     padding-bottom: 10px;
     text-shadow: 0 0 6px #00ff00;
   }
   input[type="email"],
-  input[type="password"],
-  input[type="text"] {
+  input[type="password"] {
     padding: 12px;
     border-radius: 10px;
     border: none;
@@ -82,13 +72,6 @@
     color: #00ff00;
     font-weight: bold;
     box-shadow: 0 0 6px #00ff00 inset;
-    transition: box-shadow 0.3s ease;
-  }
-  input[type="email"]:focus,
-  input[type="password"]:focus,
-  input[type="text"]:focus {
-    outline: none;
-    box-shadow: 0 0 12px #00ff00 inset;
   }
   input::placeholder {
     color: #66ff66;
@@ -126,10 +109,6 @@
   th, td {
     padding: 12px;
     text-align: center;
-    transition: background-color 0.3s ease;
-  }
-  tbody tr:hover {
-    background-color: #004400;
   }
   #offerwalls iframe {
     width: 100%;
@@ -137,7 +116,6 @@
     border: none;
     border-radius: 16px;
     box-shadow: 0 0 25px #00ff00;
-    animation: fadeIn 2s ease forwards;
   }
   .flex-row {
     display: flex;
@@ -160,22 +138,6 @@
     margin: 30px 0 10px 0;
     font-size: 0.9rem;
     text-shadow: 0 0 3px #00ff00;
-  }
-  label {
-    font-weight: bold;
-  }
-
-  /* Animations */
-  @keyframes fadeIn {
-    to { opacity: 1; }
-  }
-  @keyframes fadeInDown {
-    from { opacity: 0; transform: translateY(-20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
   }
 </style>
 
@@ -215,19 +177,8 @@
       <img src="https://i.imgur.com/7B7dLvq.png" alt="Robux" class="image-small" />
       <img src="https://i.imgur.com/ev9gqJK.png" alt="Cash" class="image-small" />
     </div>
-    <p><strong>Your Balance:</strong> <span id="user-balance" style="font-size:1.5rem;">0</span> RBX</p>
+    <p><strong>Your Balance:</strong> <span id="user-balance">0</span> RBX</p>
     <button id="refresh-balance-btn">Refresh Balance</button>
-
-    <hr style="margin: 25px 0; border-color: #00ff00aa;" />
-
-    <!-- Referral system -->
-    <section id="referral-section">
-      <h3>Referral System</h3>
-      <p>Enter referral code (User ID) to get bonus:</p>
-      <input id="referral-code" type="text" placeholder="Referral User ID" />
-      <button id="submit-referral-btn">Submit Referral</button>
-      <p id="referral-msg" style="margin-top: 12px;"></p>
-    </section>
   </section>
 
   <!-- Leaderboard -->
@@ -237,260 +188,201 @@
       <thead>
         <tr><th>Rank</th><th>User</th><th>Balance</th></tr>
       </thead>
-      <tbody id="leaderboard-body"></tbody>
+      <tbody id="leaderboard-body">
+        <!-- Filled dynamically -->
+      </tbody>
     </table>
   </section>
 
   <!-- Offerwalls -->
   <section id="offerwalls">
     <h2>Offerwalls</h2>
-    <iframe src="https://lootably.com/offerwall" title="Lootably Offerwall"></iframe>
+    <iframe id="cpx-iframe" src="" frameborder="0"></iframe>
   </section>
 </main>
 
-<footer>
-  &copy; 2025 RBX Earn Offerwall
-</footer>
+<footer>© 2025 RBX Earn Offerwall</footer>
 
 <script>
-  // Your Firebase config here (replace with your own)
+  // Your Firebase config from your message
   const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_AUTH_DOMAIN",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_STORAGE_BUCKET",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyBPzy5gI_8pYNAf6MfPAhynXFUQmoIyX0Q",
+    authDomain: "offerwall-a1633.firebaseapp.com",
+    projectId: "offerwall-a1633",
+    storageBucket: "offerwall-a1633.firebasestorage.app",
+    messagingSenderId: "1028983595144",
+    appId: "1:1028983595144:web:6e57a9663cb8a52cadff3d"
   };
 
+  // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
+
   const auth = firebase.auth();
   const db = firebase.firestore();
 
-  // UI Elements
-  const emailInput = document.getElementById('email');
-  const passwordInput = document.getElementById('password');
+  // DOM Elements
   const loginBtn = document.getElementById('login-btn');
   const registerBtn = document.getElementById('register-btn');
-  const errorMsg = document.getElementById('error-msg');
   const logoutBtn = document.getElementById('logout-btn');
-  const authSection = document.getElementById('auth-section');
-  const dashboard = document.getElementById('dashboard');
-  const offerwallsSection = document.getElementById('offerwalls');
-  const leaderboardSection = document.getElementById('leaderboard');
-  const usernameDisplay = document.getElementById('username-display');
-  const userBalanceDisplay = document.getElementById('user-balance');
-  const refreshBalanceBtn = document.getElementById('refresh-balance-btn');
-  const referralCodeInput = document.getElementById('referral-code');
-  const submitReferralBtn = document.getElementById('submit-referral-btn');
-  const referralMsg = document.getElementById('referral-msg');
-  const leaderboardBody = document.getElementById('leaderboard-body');
+  const emailInput = document.getElementById('email');
+  const passwordInput = document.getElementById('password');
+  const errorMsg = document.getElementById('error-msg');
 
-  // Current user info
+  const authSection = document.getElementById('auth-section');
+  const dashboardSection = document.getElementById('dashboard');
+  const leaderboardSection = document.getElementById('leaderboard');
+  const offerwallsSection = document.getElementById('offerwalls');
+
+  const usernameDisplay = document.getElementById('username-display');
+  const userBalanceSpan = document.getElementById('user-balance');
+  const leaderboardBody = document.getElementById('leaderboard-body');
+  const cpxIframe = document.getElementById('cpx-iframe');
+
+  const refreshBalanceBtn = document.getElementById('refresh-balance-btn');
+
+  // CPX info
+  const cpxAppId = "27501";
+  const cpxSecret = "Fw6OCES5xait8uFo59OukB2M5aENR2Qj";
+
   let currentUser = null;
 
-  // Animate numeric balance count up
-  function animateValue(id, start, end, duration) {
-    let range = end - start;
-    let current = start;
-    let increment = range / (duration / 30);
-    let obj = document.getElementById(id);
-    let timer = setInterval(() => {
-      current += increment;
-      if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
-        current = end;
-        clearInterval(timer);
-      }
-      obj.textContent = Math.floor(current);
-    }, 30);
-  }
-
-  // Show error messages
+  // Show error
   function showError(message) {
     errorMsg.textContent = message;
-    setTimeout(() => { errorMsg.textContent = ''; }, 4000);
   }
 
-  // Update UI on login
-  function updateUIOnLogin(user) {
-    currentUser = user;
-    authSection.style.display = 'none';
-    dashboard.style.display = 'block';
-    offerwallsSection.style.display = 'block';
-    leaderboardSection.style.display = 'block';
-    logoutBtn.style.display = 'inline-block';
-
-    // Show username as email prefix (before @)
-    usernameDisplay.textContent = user.email.split('@')[0];
-
-    loadUserBalance();
-    loadLeaderboard();
+  // Clear error
+  function clearError() {
+    errorMsg.textContent = '';
   }
 
-  // Load user balance from Firestore
-  async function loadUserBalance() {
+  // Setup CPX iframe URL with MD5 hash
+  function setupOfferwall(userId, username, email) {
+    const hash = CryptoJS.MD5(userId + '-' + cpxSecret).toString();
+    const src = `https://offers.cpx-research.com/index.php?app_id=${cpxAppId}&ext_user_id=${userId}&secure_hash=${hash}&username=${encodeURIComponent(username)}&email=${encodeURIComponent(email)}&subid_1=&subid_2=`;
+    cpxIframe.src = src;
+  }
+
+  // Load user balance from Firestore (or create user doc if not exists)
+  async function loadUserBalance(uid) {
+    const docRef = db.collection('users').doc(uid);
+    const doc = await docRef.get();
+    if (!doc.exists) {
+      await docRef.set({ balance: 0, username: currentUser.email.split('@')[0] });
+      return 0;
+    } else {
+      return doc.data().balance || 0;
+    }
+  }
+
+  // Update user balance display
+  async function updateBalance() {
     if (!currentUser) return;
-    const userDoc = await db.collection('users').doc(currentUser.uid).get();
-    if (userDoc.exists) {
-      const data = userDoc.data();
-      const balance = data.balance || 0;
-      animateValue('user-balance', parseInt(userBalanceDisplay.textContent) || 0, balance, 1000);
-    } else {
-      // Create user doc with 0 balance
-      await db.collection('users').doc(currentUser.uid).set({ balance: 0, referrals: 0, referredBy: null });
-      animateValue('user-balance', 0, 0, 1000);
-    }
+    const balance = await loadUserBalance(currentUser.uid);
+    userBalanceSpan.textContent = balance;
   }
 
-  // Login
-  loginBtn.addEventListener('click', async () => {
-    try {
-      const email = emailInput.value.trim();
-      const password = passwordInput.value.trim();
-      if (!email || !password) {
-        showError('Email and password required');
-        return;
-      }
-      await auth.signInWithEmailAndPassword(email, password);
-    } catch (e) {
-      showError(e.message);
-    }
-  });
-
-  // Register
-  registerBtn.addEventListener('click', async () => {
-    try {
-      const email = emailInput.value.trim();
-      const password = passwordInput.value.trim();
-      if (!email || !password) {
-        showError('Email and password required');
-        return;
-      }
-      const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-
-      // Initialize user data in Firestore
-      await db.collection('users').doc(userCredential.user.uid).set({
-        balance: 0,
-        referrals: 0,
-        referredBy: null
-      });
-    } catch (e) {
-      showError(e.message);
-    }
-  });
-
-  // Logout
-  logoutBtn.addEventListener('click', () => {
-    auth.signOut();
-  });
-
-  // Refresh balance button
-  refreshBalanceBtn.addEventListener('click', loadUserBalance);
-
-  // Listen for auth state changes
-  auth.onAuthStateChanged(user => {
-    if (user) {
-      updateUIOnLogin(user);
-    } else {
-      currentUser = null;
-      authSection.style.display = 'block';
-      dashboard.style.display = 'none';
-      offerwallsSection.style.display = 'none';
-      leaderboardSection.style.display = 'none';
-      logoutBtn.style.display = 'none';
-    }
-  });
-
-  // Load leaderboard: top 10 by balance desc
+  // Load and display leaderboard (top 10 by balance)
   async function loadLeaderboard() {
-    const snapshot = await db.collection('users')
+    leaderboardBody.innerHTML = '';
+    const querySnapshot = await db.collection('users')
       .orderBy('balance', 'desc')
       .limit(10)
       .get();
 
-    leaderboardBody.innerHTML = '';
     let rank = 1;
-    snapshot.forEach(doc => {
+    querySnapshot.forEach(doc => {
       const data = doc.data();
-      const username = doc.id === currentUser?.uid ? usernameDisplay.textContent : doc.id.substring(0, 6);
-      const row = document.createElement('tr');
-      row.innerHTML = `
-        <td>${rank++}</td>
-        <td>${username}</td>
-        <td>${data.balance || 0}</td>
-      `;
-      leaderboardBody.appendChild(row);
+      const username = data.username || doc.id;
+      const balance = data.balance || 0;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${rank}</td><td>${username}</td><td>${balance}</td>`;
+      leaderboardBody.appendChild(tr);
+      rank++;
     });
   }
 
-  // Referral system logic
-  submitReferralBtn.addEventListener('click', async () => {
-    referralMsg.textContent = '';
-    const code = referralCodeInput.value.trim();
+  // Show sections after login
+  function showDashboard() {
+    authSection.style.display = 'none';
+    dashboardSection.style.display = 'block';
+    leaderboardSection.style.display = 'block';
+    offerwallsSection.style.display = 'block';
+    logoutBtn.style.display = 'inline-block';
+  }
 
-    if (!code) {
-      referralMsg.style.color = '#ff4444';
-      referralMsg.textContent = 'Please enter a referral code.';
+  // Hide sections on logout
+  function showAuth() {
+    authSection.style.display = 'block';
+    dashboardSection.style.display = 'none';
+    leaderboardSection.style.display = 'none';
+    offerwallsSection.style.display = 'none';
+    logoutBtn.style.display = 'none';
+    emailInput.value = '';
+    passwordInput.value = '';
+  }
+
+  // On login
+  loginBtn.addEventListener('click', async () => {
+    clearError();
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+    if (!email || !password) {
+      showError('Please enter email and password.');
       return;
     }
-    if (!currentUser) return;
-
     try {
-      // Get current user's Firestore doc
-      const userDocRef = db.collection('users').doc(currentUser.uid);
-      const userDoc = await userDocRef.get();
-
-      if (userDoc.exists) {
-        const userData = userDoc.data();
-        if (userData.referredBy) {
-          referralMsg.style.color = '#ff4444';
-          referralMsg.textContent = 'Referral code already used.';
-          return;
-        }
-        if (code === currentUser.uid) {
-          referralMsg.style.color = '#ff4444';
-          referralMsg.textContent = 'You cannot refer yourself.';
-          return;
-        }
-        // Check if referral user exists
-        const referrerDoc = await db.collection('users').doc(code).get();
-        if (!referrerDoc.exists) {
-          referralMsg.style.color = '#ff4444';
-          referralMsg.textContent = 'Invalid referral code.';
-          return;
-        }
-
-        // Update referredBy for current user
-        await userDocRef.update({ referredBy: code });
-
-        // Give bonus to both users, e.g., 50 RBX each
-        const batch = db.batch();
-        const referrerRef = db.collection('users').doc(code);
-
-        batch.update(referrerRef, {
-          balance: firebase.firestore.FieldValue.increment(50),
-          referrals: firebase.firestore.FieldValue.increment(1)
-        });
-        batch.update(userDocRef, {
-          balance: firebase.firestore.FieldValue.increment(50)
-        });
-
-        await batch.commit();
-
-        referralMsg.style.color = '#00ff00';
-        referralMsg.textContent = 'Referral applied! Both you and referrer got 50 RBX bonus.';
-
-        // Update displayed balance
-        loadUserBalance();
-        loadLeaderboard();
-      }
-    } catch (err) {
-      referralMsg.style.color = '#ff4444';
-      referralMsg.textContent = 'Error applying referral.';
-      console.error(err);
+      await auth.signInWithEmailAndPassword(email, password);
+    } catch (error) {
+      showError(error.message);
     }
   });
 
+  // On register
+  registerBtn.addEventListener('click', async () => {
+    clearError();
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+    if (!email || !password) {
+      showError('Please enter email and password.');
+      return;
+    }
+    try {
+      const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+      // Add user to Firestore with initial balance
+      await db.collection('users').doc(userCredential.user.uid).set({
+        username: email.split('@')[0],
+        balance: 0,
+      });
+    } catch (error) {
+      showError(error.message);
+    }
+  });
+
+  // On logout
+  logoutBtn.addEventListener('click', async () => {
+    await auth.signOut();
+  });
+
+  // Refresh balance button
+  refreshBalanceBtn.addEventListener('click', updateBalance);
+
+  // Monitor auth state changes
+  auth.onAuthStateChanged(async (user) => {
+    if (user) {
+      currentUser = user;
+      usernameDisplay.textContent = user.email.split('@')[0];
+      showDashboard();
+      await updateBalance();
+      await loadLeaderboard();
+      setupOfferwall(user.uid, user.email.split('@')[0], user.email);
+    } else {
+      currentUser = null;
+      showAuth();
+      cpxIframe.src = '';
+    }
+  });
 </script>
+
 </body>
 </html>
