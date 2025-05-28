@@ -3,684 +3,386 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Robux Earn - Offerwall Dashboard</title>
-
-<!-- Blueimp MD5 for secure hash generation -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-md5/2.19.0/js/md5.min.js"></script>
+<title>RBX Earn Offerwall</title>
 
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
-  * {
-    box-sizing: border-box;
-  }
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
   body {
+    font-family: 'Orbitron', monospace, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #00ff00, #005500);
+    color: #00ff00;
     margin: 0; padding: 0;
-    font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #0e0e24 0%, #2c5370 100%);
-    color: #eee;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
   }
   header {
-    background: #1f2c4c;
-    padding: 15px 40px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    box-shadow: 0 4px 12px #00d8ff55;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  header h1 {
-    margin: 0;
-    font-weight: 700;
-    color: #00d8ff;
-    font-size: 1.8rem;
+    background: #003300;
+    padding: 15px 20px;
+    text-align: center;
+    font-size: 2rem;
+    font-weight: bold;
     letter-spacing: 3px;
-    cursor: default;
+    color: #00ff00;
+    position: relative;
+    text-shadow: 0 0 10px #00ff00;
   }
-  nav button {
-    background: #00d8ff;
+  #logout-btn {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    background: #00aa00;
     border: none;
-    padding: 10px 20px;
-    font-weight: 700;
-    color: #14213d;
-    border-radius: 30px;
-    cursor: pointer;
-    transition: background 0.3s ease;
-  }
-  nav button:hover {
-    background: #00b1e6;
-  }
-
-  main {
-    flex-grow: 1;
-    max-width: 1100px;
-    margin: 40px auto;
-    width: 95%;
-  }
-
-  /* --- Login/Register --- */
-  #auth-container {
-    max-width: 380px;
-    margin: 60px auto;
-    background: #14213dcc;
-    padding: 30px 35px;
-    border-radius: 16px;
-    box-shadow: 0 0 20px #00d8ff88;
-  }
-  #auth-container h2 {
-    color: #00d8ff;
-    text-align: center;
-    margin-bottom: 25px;
-    letter-spacing: 2px;
-  }
-  label {
-    display: block;
-    margin-top: 15px;
-    font-weight: 600;
-    color: #9cd6ff;
-  }
-  input {
-    width: 100%;
-    margin-top: 8px;
-    padding: 10px 12px;
+    padding: 8px 15px;
+    font-weight: bold;
     border-radius: 8px;
-    border: none;
-    font-size: 1rem;
-    outline: none;
-    background: #0e1c36;
-    color: #eee;
-  }
-  button.submit-btn {
-    width: 100%;
-    background: #00d8ff;
-    border: none;
-    margin-top: 25px;
-    padding: 14px 0;
-    font-weight: 700;
-    border-radius: 40px;
-    font-size: 1.1rem;
-    color: #14213d;
     cursor: pointer;
-    transition: background 0.3s ease;
+    color: #003300;
+    display: none;
+    box-shadow: 0 0 8px #00ff00;
   }
-  button.submit-btn:hover {
-    background: #00a8d9;
+  #logout-btn:hover {
+    background: #00ff00;
+    color: #003300;
+    box-shadow: 0 0 20px #00ff00;
   }
-  p.switch-form {
-    margin-top: 20px;
-    text-align: center;
-    color: #9cd6ff;
+  main {
+    max-width: 900px;
+    margin: 30px auto;
+    background: #002200cc;
+    border-radius: 16px;
+    padding: 25px;
+    box-shadow: 0 0 30px #00ff00;
   }
-  p.switch-form a {
-    color: #00d8ff;
-    cursor: pointer;
-    text-decoration: none;
+  section {
+    margin-bottom: 35px;
   }
-  p.switch-form a:hover {
-    text-decoration: underline;
+  h2 {
+    border-bottom: 3px solid #00ff00;
+    padding-bottom: 10px;
+    text-shadow: 0 0 6px #00ff00;
   }
-  .error-msg {
-    margin-top: 12px;
-    color: #ff6b6b;
-    font-weight: 700;
-    text-align: center;
-  }
-  .success-msg {
-    margin-top: 12px;
-    color: #7eff7e;
-    font-weight: 700;
-    text-align: center;
-  }
-
-  /* --- Dashboard --- */
-  #dashboard {
-    background: #14213dcc;
-    border-radius: 20px;
-    padding: 30px 40px;
-    box-shadow: 0 0 30px #00d8ffaa;
-  }
-  #dashboard h2 {
-    text-align: center;
-    font-weight: 700;
-    margin-bottom: 10px;
-    color: #00d8ff;
-    letter-spacing: 2px;
-  }
-  #user-info {
-    text-align: center;
-    font-size: 1.1rem;
-    margin-bottom: 20px;
-    color: #9cd6ff;
-  }
-  #balance-display {
-    font-size: 1.8rem;
-    font-weight: 900;
-    color: #00ffcc;
-    text-align: center;
-    margin-bottom: 25px;
-    text-shadow: 0 0 5px #00d8ffbb;
-  }
-  #daily-reward {
-    display: block;
-    max-width: 280px;
-    margin: 0 auto 35px auto;
-    background: #00d8ff22;
-    color: #00d8ff;
-    padding: 15px 0;
-    font-weight: 700;
-    font-size: 1.15rem;
-    text-align: center;
-    border-radius: 40px;
-    cursor: pointer;
-    user-select: none;
-    box-shadow: 0 0 12px #00d8ff99;
-    transition: background 0.3s ease;
-  }
-  #daily-reward:disabled {
-    cursor: not-allowed;
-    color: #006677;
-    background: #00445522;
-  }
-  #daily-reward:hover:not(:disabled) {
-    background: #00b1e633;
-  }
-
-  #referral-section {
-    background: #0e1c3622;
-    text-align: center;
-    padding: 18px 25px;
-    border-radius: 15px;
-    margin-bottom: 40px;
-    font-size: 1rem;
-    color: #9cd6ff;
-  }
-  #referral-link {
-    background: #0e1c36;
-    padding: 10px 18px;
-    user-select: all;
+  input[type="email"],
+  input[type="password"] {
+    padding: 12px;
     border-radius: 10px;
-    margin-top: 10px;
-    display: inline-block;
-    cursor: pointer;
-    border: 1.5px solid #00d8ff;
-    color: #00d8ff;
-    font-weight: 600;
-    transition: background 0.3s ease;
-  }
-  #referral-link:hover {
-    background: #00d8ff22;
-  }
-
-  /* Offerwalls tabs */
-  .offerwall-tabs {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin-bottom: 25px;
-    flex-wrap: wrap;
-  }
-  .offerwall-tabs button {
-    background: #14213d;
-    color: #00d8ff;
-    border: 2px solid #00d8ff;
-    padding: 12px 25px;
-    font-weight: 700;
-    border-radius: 30px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    min-width: 140px;
-  }
-  .offerwall-tabs button.active {
-    background: #00d8ff;
-    color: #14213d;
-    box-shadow: 0 0 20px #00d8ffcc;
-  }
-  .offerwall-tabs button:hover:not(.active) {
-    background: #004466;
-  }
-
-  /* iframe */
-  iframe.offerwall-frame {
-    width: 100%;
-    height: 750px;
     border: none;
-    border-radius: 20px;
-    box-shadow: 0 0 25px #00d8ffaa;
-    transition: height 0.3s ease;
+    width: 100%;
+    max-width: 350px;
+    margin-top: 12px;
+    margin-bottom: 18px;
+    background: #003300;
+    color: #00ff00;
+    font-weight: bold;
+    box-shadow: 0 0 6px #00ff00 inset;
   }
-
-  /* Leaderboard */
-  #leaderboard {
-    margin-top: 50px;
-    background: #14213dcc;
-    border-radius: 20px;
-    padding: 25px 30px;
-    box-shadow: 0 0 20px #00d8ffbb;
+  input::placeholder {
+    color: #66ff66;
   }
-  #leaderboard h3 {
-    color: #00d8ff;
-    font-weight: 700;
-    margin-bottom: 20px;
-    text-align: center;
+  button {
+    background: #00ff00;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 28px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #003300;
+    font-size: 1rem;
+    margin-right: 10px;
+    box-shadow: 0 0 10px #00ff00;
+    transition: all 0.3s ease;
+  }
+  button:hover {
+    background: #66ff66;
+    color: #003300;
+    box-shadow: 0 0 25px #00ff00;
+  }
+  #dashboard, #leaderboard, #offerwalls {
+    display: none;
   }
   table {
     width: 100%;
     border-collapse: collapse;
-    color: #9cd6ff;
+    margin-top: 15px;
+    color: #00ff00;
+  }
+  table, th, td {
+    border: 1px solid #00ff00;
   }
   th, td {
-    padding: 12px 15px;
+    padding: 12px;
     text-align: center;
-    border-bottom: 1px solid #00d8ff44;
   }
-  th {
-    background: #0e1c36;
-    font-weight: 700;
+  #offerwalls iframe {
+    width: 100%;
+    height: 700px;
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 0 25px #00ff00;
   }
-  tbody tr:hover {
-    background: #00d8ff33;
-  }
-
-  /* Robux & cash images */
-  #hero-images {
+  .flex-row {
     display: flex;
-    justify-content: center;
-    gap: 40px;
-    margin-bottom: 45px;
-    flex-wrap: wrap;
+    align-items: center;
+    gap: 18px;
   }
-  #hero-images img {
-    height: 120px;
-    border-radius: 18px;
-    box-shadow: 0 0 30px #00d8ffcc;
-    cursor: default;
-    transition: transform 0.3s ease;
+  .image-small {
+    height: 60px;
+    filter: drop-shadow(0 0 6px #00ff00);
   }
-  #hero-images img:hover {
-    transform: scale(1.1);
+  #error-msg {
+    color: #ff4444;
+    font-weight: bold;
+    margin-top: 10px;
+    text-shadow: none;
   }
-
-  /* Responsive */
-  @media (max-width: 760px) {
-    #auth-container {
-      max-width: 90vw;
-      padding: 25px 20px;
-    }
-    main {
-      margin: 20px auto;
-      width: 95%;
-    }
-    iframe.offerwall-frame {
-      height: 500px;
-    }
+  footer {
+    text-align: center;
+    color: #00ff00aa;
+    margin: 30px 0 10px 0;
+    font-size: 0.9rem;
+    text-shadow: 0 0 3px #00ff00;
   }
 </style>
-</head>
-<body>
 
-<header>
-  <h1>Robux Earn</h1>
-  <nav>
-    <button id="logout-btn" style="display:none;">Logout</button>
-  </nav>
-</header>
-
-<main>
-
-  <!-- Home / Login/Register -->
-  <section id="auth-container">
-    <h2 id="auth-title">Login to Robux Earn</h2>
-    <form id="auth-form">
-      <label for="email-input">Email Address</label>
-      <input type="email" id="email-input" required autocomplete="username" />
-      <label for="password-input">Password</label>
-      <input type="password" id="password-input" required autocomplete="current-password" />
-      <button type="submit" class="submit-btn" id="auth-submit-btn">Login</button>
-    </form>
-    <p class="switch-form" id="switch-text">Don't have an account? <a id="switch-link" href="#">Register here</a></p>
-    <p class="error-msg" id="auth-error"></p>
-    <p class="success-msg" id="auth-success"></p>
-  </section>
-
-  <!-- Dashboard -->
-  <section id="dashboard" style="display:none;">
-    <h2>Welcome, <span id="user-name"></span>!</h2>
-    <div id="user-info">Email: <span id="user-email"></span></div>
-    <div id="balance-display">Balance: <span id="user-balance">0</span> Robux</div>
-    <button id="daily-reward">Claim Daily Reward (50 Robux)</button>
-
-    <div id="referral-section">
-      Your referral link:<br />
-      <span id="referral-link" title="Click to copy"></span>
-    </div>
-
-    <div id="hero-images">
-      <img src="https://i.imgur.com/Nkdz6cP.png" alt="Robux" title="Robux" />
-      <img src="https://i.imgur.com/qfY72vl.png" alt="Cash" title="Cash" />
-    </div>
-
-    <div class="offerwall-tabs">
-      <button class="tab-btn active" data-tab="cpx">CPX Research</button>
-      <button class="tab-btn" data-tab="lootably">Lootably</button>
-      <button class="tab-btn" data-tab="offertoro">OfferToro</button>
-    </div>
-
-    <iframe id="offerwall-frame" class="offerwall-frame" src=""></iframe>
-
-    <div id="leaderboard">
-      <h3>Leaderboard</h3>
-      <table>
-        <thead>
-          <tr><th>Rank</th><th>Username</th><th>Balance</th></tr>
-        </thead>
-        <tbody id="leaderboard-body">
-          <!-- populated dynamically -->
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-</main>
-
-<!-- Firebase -->
+<!-- Firebase compat SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
+<!-- CryptoJS for MD5 hashing -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
+</head>
+<body>
+
+<header>
+  RBX Earn Offerwall
+  <button id="logout-btn" title="Logout">Logout</button>
+</header>
+
+<main>
+  <!-- Authentication Section -->
+  <section id="auth-section">
+    <h2>Login or Register</h2>
+    <input id="email" type="email" placeholder="Email" required />
+    <input id="password" type="password" placeholder="Password" required />
+    <div>
+      <button id="login-btn">Login</button>
+      <button id="register-btn">Register</button>
+    </div>
+    <div id="error-msg"></div>
+  </section>
+
+  <!-- Dashboard -->
+  <section id="dashboard">
+    <h2>Welcome, <span id="username-display"></span>!</h2>
+    <div class="flex-row" style="justify-content: center; margin-bottom: 20px;">
+      <img src="https://i.imgur.com/7B7dLvq.png" alt="Robux" class="image-small" />
+      <img src="https://i.imgur.com/ev9gqJK.png" alt="Cash" class="image-small" />
+    </div>
+    <p><strong>Your Balance:</strong> <span id="user-balance">0</span> RBX</p>
+    <button id="refresh-balance-btn">Refresh Balance</button>
+  </section>
+
+  <!-- Leaderboard -->
+  <section id="leaderboard">
+    <h2>Leaderboard</h2>
+    <table>
+      <thead>
+        <tr><th>Rank</th><th>User</th><th>Balance</th></tr>
+      </thead>
+      <tbody id="leaderboard-body">
+        <!-- Filled dynamically -->
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Offerwalls -->
+  <section id="offerwalls">
+    <h2>Offerwalls</h2>
+    <iframe id="cpx-iframe" src="" frameborder="0"></iframe>
+  </section>
+</main>
+
+<footer>© 2025 RBX Earn Offerwall</footer>
+
 <script>
-  // TODO: Replace with your Firebase config
+  // Your Firebase config from your message
   const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_AUTH_DOMAIN",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_STORAGE_BUCKET",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyBPzy5gI_8pYNAf6MfPAhynXFUQmoIyX0Q",
+    authDomain: "offerwall-a1633.firebaseapp.com",
+    projectId: "offerwall-a1633",
+    storageBucket: "offerwall-a1633.firebasestorage.app",
+    messagingSenderId: "1028983595144",
+    appId: "1:1028983595144:web:6e57a9663cb8a52cadff3d"
   };
 
+  // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
 
   const auth = firebase.auth();
   const db = firebase.firestore();
 
-  // Elements
-  const authContainer = document.getElementById('auth-container');
-  const dashboard = document.getElementById('dashboard');
-  const authForm = document.getElementById('auth-form');
-  const authTitle = document.getElementById('auth-title');
-  const authSubmitBtn = document.getElementById('auth-submit-btn');
-  const switchText = document.getElementById('switch-text');
-  const switchLink = document.getElementById('switch-link');
-  const authError = document.getElementById('auth-error');
-  const authSuccess = document.getElementById('auth-success');
+  // DOM Elements
+  const loginBtn = document.getElementById('login-btn');
+  const registerBtn = document.getElementById('register-btn');
   const logoutBtn = document.getElementById('logout-btn');
+  const emailInput = document.getElementById('email');
+  const passwordInput = document.getElementById('password');
+  const errorMsg = document.getElementById('error-msg');
 
-  const userNameSpan = document.getElementById('user-name');
-  const userEmailSpan = document.getElementById('user-email');
+  const authSection = document.getElementById('auth-section');
+  const dashboardSection = document.getElementById('dashboard');
+  const leaderboardSection = document.getElementById('leaderboard');
+  const offerwallsSection = document.getElementById('offerwalls');
+
+  const usernameDisplay = document.getElementById('username-display');
   const userBalanceSpan = document.getElementById('user-balance');
-  const dailyRewardBtn = document.getElementById('daily-reward');
-  const referralLinkSpan = document.getElementById('referral-link');
-
-  const offerwallFrame = document.getElementById('offerwall-frame');
-  const tabButtons = document.querySelectorAll('.tab-btn');
   const leaderboardBody = document.getElementById('leaderboard-body');
+  const cpxIframe = document.getElementById('cpx-iframe');
 
-  let isLoginMode = true;
-  let currentUserData = null;
+  const refreshBalanceBtn = document.getElementById('refresh-balance-btn');
 
-  // CPX Research config
-  const CPX_APP_ID = '27501'; // your CPX app ID
-  const CPX_SECRET_KEY = '-Fw6OCES5xait8uFo59OukB2M5aENR2Qj'; // your secret key from CPX dashboard
+  // CPX info
+  const cpxAppId = "27501";
+  const cpxSecret = "Fw6OCES5xait8uFo59OukB2M5aENR2Qj";
 
-  // Lootably & Offertoro iframe src placeholders (replace with your actual iframe URLs)
-  const LOOTABLY_IFRAME = 'https://lootably.com/your_offerwall_here';
-  const OFFERTORO_IFRAME = 'https://www.offertoro.com/your_offerwall_here';
+  let currentUser = null;
 
-  // Utility function to generate referral link
-  function getReferralLink(uid) {
-    return `${window.location.origin}?ref=${uid}`;
+  // Show error
+  function showError(message) {
+    errorMsg.textContent = message;
   }
 
-  // Toggle between Login and Register form
-  switchLink.addEventListener('click', e => {
-    e.preventDefault();
-    isLoginMode = !isLoginMode;
-    if(isLoginMode) {
-      authTitle.textContent = 'Login to Robux Earn';
-      authSubmitBtn.textContent = 'Login';
-      switchText.innerHTML = `Don't have an account? <a id="switch-link" href="#">Register here</a>`;
+  // Clear error
+  function clearError() {
+    errorMsg.textContent = '';
+  }
+
+  // Setup CPX iframe URL with MD5 hash
+  function setupOfferwall(userId, username, email) {
+    const hash = CryptoJS.MD5(userId + '-' + cpxSecret).toString();
+    const src = `https://offers.cpx-research.com/index.php?app_id=${cpxAppId}&ext_user_id=${userId}&secure_hash=${hash}&username=${encodeURIComponent(username)}&email=${encodeURIComponent(email)}&subid_1=&subid_2=`;
+    cpxIframe.src = src;
+  }
+
+  // Load user balance from Firestore (or create user doc if not exists)
+  async function loadUserBalance(uid) {
+    const docRef = db.collection('users').doc(uid);
+    const doc = await docRef.get();
+    if (!doc.exists) {
+      await docRef.set({ balance: 0, username: currentUser.email.split('@')[0] });
+      return 0;
     } else {
-      authTitle.textContent = 'Register for Robux Earn';
-      authSubmitBtn.textContent = 'Register';
-      switchText.innerHTML = `Already have an account? <a id="switch-link" href="#">Login here</a>`;
-    }
-  });
-
-  // Auth form submit handler
-  authForm.addEventListener('submit', e => {
-    e.preventDefault();
-    authError.textContent = '';
-    authSuccess.textContent = '';
-    const email = document.getElementById('email-input').value.trim();
-    const password = document.getElementById('password-input').value.trim();
-
-    if(isLoginMode) {
-      // Login
-      auth.signInWithEmailAndPassword(email, password)
-        .then(cred => {
-          authSuccess.textContent = 'Logged in successfully!';
-          loadUserDashboard(cred.user);
-        })
-        .catch(err => {
-          authError.textContent = err.message;
-        });
-    } else {
-      // Register
-      auth.createUserWithEmailAndPassword(email, password)
-        .then(cred => {
-          // Create user doc in Firestore
-          return db.collection('users').doc(cred.user.uid).set({
-            username: email.split('@')[0],
-            email: email,
-            balance: 0,
-            lastDailyReward: null,
-            referrals: 0,
-          }).then(() => cred.user);
-        })
-        .then(user => {
-          authSuccess.textContent = 'Registered successfully! Logging you in...';
-          loadUserDashboard(user);
-        })
-        .catch(err => {
-          authError.textContent = err.message;
-        });
-    }
-  });
-
-  // Logout
-  logoutBtn.addEventListener('click', () => {
-    auth.signOut().then(() => {
-      currentUserData = null;
-      dashboard.style.display = 'none';
-      authContainer.style.display = 'block';
-      logoutBtn.style.display = 'none';
-      clearAuthForm();
-    });
-  });
-
-  // Clear auth form
-  function clearAuthForm() {
-    authForm.reset();
-    authError.textContent = '';
-    authSuccess.textContent = '';
-  }
-
-  // On auth state changed
-  auth.onAuthStateChanged(user => {
-    if(user) {
-      loadUserDashboard(user);
-    } else {
-      dashboard.style.display = 'none';
-      authContainer.style.display = 'block';
-      logoutBtn.style.display = 'none';
-    }
-  });
-
-  // Load dashboard with user data
-  async function loadUserDashboard(user) {
-    authContainer.style.display = 'none';
-    dashboard.style.display = 'block';
-    logoutBtn.style.display = 'inline-block';
-
-    userNameSpan.textContent = user.email.split('@')[0];
-    userEmailSpan.textContent = user.email;
-
-    // Load user Firestore data
-    const userDoc = await db.collection('users').doc(user.uid).get();
-    if(!userDoc.exists) {
-      // Create user doc if missing
-      await db.collection('users').doc(user.uid).set({
-        username: user.email.split('@')[0],
-        email: user.email,
-        balance: 0,
-        lastDailyReward: null,
-        referrals: 0,
-      });
-    }
-
-    currentUserData = (await db.collection('users').doc(user.uid).get()).data();
-
-    updateBalanceDisplay();
-    updateReferralLink(user.uid);
-    updateDailyRewardButton(user.uid);
-    setupOfferwall('cpx', user);
-    loadLeaderboard();
-
-  }
-
-  // Update balance display
-  async function updateBalanceDisplay() {
-    const doc = await db.collection('users').doc(auth.currentUser.uid).get();
-    if(doc.exists) {
-      userBalanceSpan.textContent = doc.data().balance || 0;
+      return doc.data().balance || 0;
     }
   }
 
-  // Daily reward claim
-  dailyRewardBtn.addEventListener('click', async () => {
-    const uid = auth.currentUser.uid;
-    const userRef = db.collection('users').doc(uid);
-    const doc = await userRef.get();
-    const data = doc.data();
-
-    const lastReward = data.lastDailyReward ? data.lastDailyReward.toDate() : null;
-    const now = new Date();
-
-    if(lastReward && (now - lastReward) < 24 * 60 * 60 * 1000) {
-      alert('You can only claim the daily reward once every 24 hours.');
-      return;
-    }
-
-    const newBalance = (data.balance || 0) + 50;
-
-    await userRef.update({
-      balance: newBalance,
-      lastDailyReward: firebase.firestore.Timestamp.fromDate(now)
-    });
-
-    updateBalanceDisplay();
-    updateDailyRewardButton(uid);
-    alert('You claimed 50 Robux as a daily reward!');
-  });
-
-  // Disable daily reward button if claimed in last 24h
-  async function updateDailyRewardButton(uid) {
-    const doc = await db.collection('users').doc(uid).get();
-    const data = doc.data();
-
-    const lastReward = data.lastDailyReward ? data.lastDailyReward.toDate() : null;
-    const now = new Date();
-
-    if(lastReward && (now - lastReward) < 24 * 60 * 60 * 1000) {
-      dailyRewardBtn.disabled = true;
-      dailyRewardBtn.textContent = 'Daily Reward Claimed - Come Back Tomorrow';
-    } else {
-      dailyRewardBtn.disabled = false;
-      dailyRewardBtn.textContent = 'Claim Daily Reward (50 Robux)';
-    }
+  // Update user balance display
+  async function updateBalance() {
+    if (!currentUser) return;
+    const balance = await loadUserBalance(currentUser.uid);
+    userBalanceSpan.textContent = balance;
   }
 
-  // Setup referral link
-  function updateReferralLink(uid) {
-    const refLink = getReferralLink(uid);
-    referralLinkSpan.textContent = refLink;
-    referralLinkSpan.onclick = () => {
-      navigator.clipboard.writeText(refLink);
-      alert('Referral link copied!');
-    };
-  }
-
-  // Setup offerwall iframe src depending on selected tab and user info
-  function setupOfferwall(type, user) {
-    let src = '';
-    const userId = user.uid;
-    const userName = user.email.split('@')[0];
-    const email = user.email;
-
-    if(type === 'cpx') {
-      // Generate secure hash
-      const secureHash = md5(userId + CPX_SECRET_KEY);
-      src = `https://offers.cpx-research.com/index.php?app_id=${CPX_APP_ID}&ext_user_id=${encodeURIComponent(userId)}&secure_hash=${secureHash}&username=${encodeURIComponent(userName)}&email=${encodeURIComponent(email)}&subid_1=&subid_2=`;
-    } else if(type === 'lootably') {
-      src = LOOTABLY_IFRAME;
-    } else if(type === 'offertoro') {
-      src = OFFERTORO_IFRAME;
-    }
-    offerwallFrame.src = src;
-  }
-
-  // Tabs switch handler
-  tabButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      tabButtons.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      setupOfferwall(btn.dataset.tab, auth.currentUser);
-    });
-  });
-
-  // Load leaderboard (top 10 by balance)
+  // Load and display leaderboard (top 10 by balance)
   async function loadLeaderboard() {
+    leaderboardBody.innerHTML = '';
     const querySnapshot = await db.collection('users')
       .orderBy('balance', 'desc')
       .limit(10)
       .get();
 
-    leaderboardBody.innerHTML = '';
-
     let rank = 1;
     querySnapshot.forEach(doc => {
       const data = doc.data();
-      const row = document.createElement('tr');
-      row.innerHTML = `<td>${rank}</td><td>${data.username || 'Unknown'}</td><td>${data.balance || 0}</td>`;
-      leaderboardBody.appendChild(row);
+      const username = data.username || doc.id;
+      const balance = data.balance || 0;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${rank}</td><td>${username}</td><td>${balance}</td>`;
+      leaderboardBody.appendChild(tr);
       rank++;
     });
   }
 
-  // MD5 implementation or use external library to generate secure hash for CPX
-  // Simple MD5 function adapted for brevity (in production use a library)
-  function md5(string) {
-    // For production, use a robust md5 library or crypto API
-    return CryptoJS.MD5(string).toString();
+  // Show sections after login
+  function showDashboard() {
+    authSection.style.display = 'none';
+    dashboardSection.style.display = 'block';
+    leaderboardSection.style.display = 'block';
+    offerwallsSection.style.display = 'block';
+    logoutBtn.style.display = 'inline-block';
   }
 
-</script>
+  // Hide sections on logout
+  function showAuth() {
+    authSection.style.display = 'block';
+    dashboardSection.style.display = 'none';
+    leaderboardSection.style.display = 'none';
+    offerwallsSection.style.display = 'none';
+    logoutBtn.style.display = 'none';
+    emailInput.value = '';
+    passwordInput.value = '';
+  }
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  // On login
+  loginBtn.addEventListener('click', async () => {
+    clearError();
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+    if (!email || !password) {
+      showError('Please enter email and password.');
+      return;
+    }
+    try {
+      await auth.signInWithEmailAndPassword(email, password);
+    } catch (error) {
+      showError(error.message);
+    }
+  });
+
+  // On register
+  registerBtn.addEventListener('click', async () => {
+    clearError();
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+    if (!email || !password) {
+      showError('Please enter email and password.');
+      return;
+    }
+    try {
+      const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+      // Add user to Firestore with initial balance
+      await db.collection('users').doc(userCredential.user.uid).set({
+        username: email.split('@')[0],
+        balance: 0,
+      });
+    } catch (error) {
+      showError(error.message);
+    }
+  });
+
+  // On logout
+  logoutBtn.addEventListener('click', async () => {
+    await auth.signOut();
+  });
+
+  // Refresh balance button
+  refreshBalanceBtn.addEventListener('click', updateBalance);
+
+  // Monitor auth state changes
+  auth.onAuthStateChanged(async (user) => {
+    if (user) {
+      currentUser = user;
+      usernameDisplay.textContent = user.email.split('@')[0];
+      showDashboard();
+      await updateBalance();
+      await loadLeaderboard();
+      setupOfferwall(user.uid, user.email.split('@')[0], user.email);
+    } else {
+      currentUser = null;
+      showAuth();
+      cpxIframe.src = '';
+    }
+  });
+</script>
 
 </body>
 </html>
