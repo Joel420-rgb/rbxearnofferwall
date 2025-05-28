@@ -1,144 +1,139 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>RBX Earn Offerwall</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RBX Earn Offerwall</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
+    body {
+      font-family: 'Orbitron', monospace, sans-serif;
+      background: linear-gradient(135deg, #00ff00, #005500);
+      color: #00ff00;
+      margin: 0; padding: 0;
+    }
+    header {
+      background: #003300;
+      padding: 15px 20px;
+      text-align: center;
+      font-size: 2rem;
+      font-weight: bold;
+      letter-spacing: 3px;
+      color: #00ff00;
+      position: relative;
+      text-shadow: 0 0 10px #00ff00;
+    }
+    #logout-btn {
+      position: absolute;
+      right: 20px;
+      top: 15px;
+      background: #00aa00;
+      border: none;
+      padding: 8px 15px;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      color: #003300;
+      display: none;
+      box-shadow: 0 0 8px #00ff00;
+    }
+    #logout-btn:hover {
+      background: #00ff00;
+      color: #003300;
+      box-shadow: 0 0 20px #00ff00;
+    }
+    main {
+      max-width: 900px;
+      margin: 30px auto;
+      background: #002200cc;
+      border-radius: 16px;
+      padding: 25px;
+      box-shadow: 0 0 30px #00ff00;
+    }
+    section {
+      margin-bottom: 35px;
+    }
+    h2 {
+      border-bottom: 3px solid #00ff00;
+      padding-bottom: 10px;
+      text-shadow: 0 0 6px #00ff00;
+    }
+    input[type="email"],
+    input[type="password"] {
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      width: 100%;
+      max-width: 350px;
+      margin-top: 12px;
+      margin-bottom: 18px;
+      background: #003300;
+      color: #00ff00;
+      font-weight: bold;
+      box-shadow: 0 0 6px #00ff00 inset;
+    }
+    input::placeholder {
+      color: #66ff66;
+    }
+    button {
+      background: #00ff00;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 28px;
+      font-weight: bold;
+      cursor: pointer;
+      color: #003300;
+      font-size: 1rem;
+      margin: 6px;
+      box-shadow: 0 0 10px #00ff00;
+      transition: all 0.3s ease;
+    }
+    button:hover {
+      background: #66ff66;
+      box-shadow: 0 0 25px #00ff00;
+    }
+    #dashboard, #leaderboard {
+      display: none;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      color: #00ff00;
+    }
+    th, td {
+      border: 1px solid #00ff00;
+      padding: 12px;
+      text-align: center;
+    }
+    .flex-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+    }
+    .image-small {
+      height: 60px;
+      filter: drop-shadow(0 0 6px #00ff00);
+    }
+    #error-msg {
+      color: #ff4444;
+      font-weight: bold;
+    }
+    footer {
+      text-align: center;
+      margin: 30px 0 10px;
+      font-size: 0.9rem;
+      color: #00ff00aa;
+    }
+  </style>
 
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
-  body {
-    font-family: 'Orbitron', monospace;
-    background: linear-gradient(135deg, #00ff00, #005500);
-    color: #00ff00;
-    margin: 0;
-    padding: 0;
-  }
-  header {
-    background: #003300;
-    padding: 15px 20px;
-    text-align: center;
-    font-size: 2rem;
-    font-weight: bold;
-    letter-spacing: 3px;
-    color: #00ff00;
-    position: relative;
-    text-shadow: 0 0 10px #00ff00;
-  }
-  #logout-btn {
-    position: absolute;
-    right: 20px;
-    top: 15px;
-    background: #00aa00;
-    border: none;
-    padding: 8px 15px;
-    font-weight: bold;
-    border-radius: 8px;
-    cursor: pointer;
-    color: #003300;
-    display: none;
-    box-shadow: 0 0 8px #00ff00;
-  }
-  #logout-btn:hover {
-    background: #00ff00;
-    box-shadow: 0 0 20px #00ff00;
-  }
-  main {
-    max-width: 900px;
-    margin: 30px auto;
-    background: #002200cc;
-    border-radius: 16px;
-    padding: 25px;
-    box-shadow: 0 0 30px #00ff00;
-  }
-  section {
-    margin-bottom: 35px;
-  }
-  h2 {
-    border-bottom: 3px solid #00ff00;
-    padding-bottom: 10px;
-    text-shadow: 0 0 6px #00ff00;
-  }
-  input[type="email"], input[type="password"] {
-    padding: 12px;
-    border-radius: 10px;
-    border: none;
-    width: 100%;
-    max-width: 350px;
-    margin-top: 12px;
-    margin-bottom: 18px;
-    background: #003300;
-    color: #00ff00;
-    font-weight: bold;
-    box-shadow: 0 0 6px #00ff00 inset;
-  }
-  input::placeholder {
-    color: #66ff66;
-  }
-  button {
-    background: #00ff00;
-    border: none;
-    border-radius: 10px;
-    padding: 12px 28px;
-    font-weight: bold;
-    cursor: pointer;
-    color: #003300;
-    font-size: 1rem;
-    margin-right: 10px;
-    box-shadow: 0 0 10px #00ff00;
-    transition: all 0.3s ease;
-  }
-  button:hover {
-    background: #66ff66;
-    box-shadow: 0 0 25px #00ff00;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-    color: #00ff00;
-  }
-  th, td {
-    border: 1px solid #00ff00;
-    padding: 12px;
-    text-align: center;
-  }
-  #offerwalls iframe {
-    width: 100%;
-    height: 700px;
-    border: none;
-    border-radius: 16px;
-    box-shadow: 0 0 25px #00ff00;
-  }
-  .flex-row {
-    display: flex;
-    align-items: center;
-    gap: 18px;
-  }
-  .image-small {
-    height: 60px;
-    filter: drop-shadow(0 0 6px #00ff00);
-  }
-  #error-msg {
-    color: #ff4444;
-    font-weight: bold;
-    margin-top: 10px;
-  }
-  footer {
-    text-align: center;
-    color: #00ff00aa;
-    margin: 30px 0 10px 0;
-    font-size: 0.9rem;
-    text-shadow: 0 0 3px #00ff00;
-  }
-</style>
-
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 </head>
+
 <body>
 <header>
   RBX Earn Offerwall
@@ -146,10 +141,11 @@
 </header>
 
 <main>
+  <!-- Login/Register -->
   <section id="auth-section">
     <h2>Login or Register</h2>
-    <input id="email" type="email" placeholder="Email" />
-    <input id="password" type="password" placeholder="Password" />
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Password" />
     <div>
       <button id="login-btn">Login</button>
       <button id="register-btn">Register</button>
@@ -157,25 +153,28 @@
     <div id="error-msg"></div>
   </section>
 
-  <section id="dashboard" style="display:none;">
+  <!-- Dashboard -->
+  <section id="dashboard">
     <h2>Welcome, <span id="username-display"></span>!</h2>
-    <p><strong>Your Balance:</strong> <span id="user-balance">0</span> RBX</p>
+    <div class="flex-row">
+      <img src="https://i.imgur.com/7B7dLvq.png" class="image-small" />
+      <img src="https://i.imgur.com/ev9gqJK.png" class="image-small" />
+    </div>
+    <p><strong>Balance:</strong> <span id="user-balance">0</span> RBX</p>
     <button id="refresh-balance-btn">Refresh Balance</button>
-    <button id="daily-btn">Claim Daily Reward</button>
-    <p><strong>Your Referral Link:</strong><br><span id="referral-link"></span></p>
+    <button id="daily-reward-btn">Claim Daily Reward</button>
+    <button id="open-cpx-btn">Open Offerwall</button>
   </section>
 
-  <section id="leaderboard" style="display:none;">
+  <!-- Leaderboard -->
+  <section id="leaderboard">
     <h2>Leaderboard</h2>
     <table>
-      <thead><tr><th>Rank</th><th>User</th><th>Balance</th></tr></thead>
+      <thead>
+        <tr><th>Rank</th><th>User</th><th>Balance</th></tr>
+      </thead>
       <tbody id="leaderboard-body"></tbody>
     </table>
-  </section>
-
-  <section id="offerwalls" style="display:none;">
-    <h2>Offerwalls</h2>
-    <iframe id="cpx-iframe" src=""></iframe>
   </section>
 </main>
 
@@ -194,37 +193,47 @@
   const auth = firebase.auth();
   const db = firebase.firestore();
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const referrerUid = urlParams.get("ref");
-
-  const emailInput = document.getElementById("email");
-  const passwordInput = document.getElementById("password");
   const loginBtn = document.getElementById("login-btn");
   const registerBtn = document.getElementById("register-btn");
   const logoutBtn = document.getElementById("logout-btn");
-  const usernameDisplay = document.getElementById("username-display");
-  const userBalanceSpan = document.getElementById("user-balance");
+  const dailyRewardBtn = document.getElementById("daily-reward-btn");
+  const openCpxBtn = document.getElementById("open-cpx-btn");
+
   const refreshBalanceBtn = document.getElementById("refresh-balance-btn");
-  const dailyBtn = document.getElementById("daily-btn");
-  const leaderboardBody = document.getElementById("leaderboard-body");
-  const cpxIframe = document.getElementById("cpx-iframe");
-  const referralLink = document.getElementById("referral-link");
   const errorMsg = document.getElementById("error-msg");
+
+  const emailInput = document.getElementById("email");
+  const passwordInput = document.getElementById("password");
+
+  const authSection = document.getElementById("auth-section");
+  const dashboard = document.getElementById("dashboard");
+  const leaderboard = document.getElementById("leaderboard");
+
+  const usernameDisplay = document.getElementById("username-display");
+  const userBalance = document.getElementById("user-balance");
+  const leaderboardBody = document.getElementById("leaderboard-body");
 
   const cpxAppId = "27501";
   const cpxSecret = "Fw6OCES5xait8uFo59OukB2M5aENR2Qj";
 
   let currentUser = null;
 
-  function showError(msg) {
-    errorMsg.textContent = msg;
+  function showError(message) {
+    errorMsg.textContent = message;
+  }
+
+  function clearError() {
+    errorMsg.textContent = "";
   }
 
   async function loadUserBalance(uid) {
-    const docRef = db.collection("users").doc(uid);
-    const doc = await docRef.get();
+    const doc = await db.collection("users").doc(uid).get();
     if (!doc.exists) {
-      await docRef.set({ balance: 0, username: currentUser.email.split("@")[0], lastDaily: null });
+      await db.collection("users").doc(uid).set({
+        balance: 0,
+        username: currentUser.email.split("@")[0],
+        lastDailyReward: null
+      });
       return 0;
     }
     return doc.data().balance || 0;
@@ -232,77 +241,88 @@
 
   async function updateBalance() {
     if (!currentUser) return;
-    const balance = await loadUserBalance(currentUser.uid);
-    userBalanceSpan.textContent = balance;
-  }
-
-  async function loadLeaderboard() {
-    leaderboardBody.innerHTML = "";
-    const querySnapshot = await db.collection("users")
-      .orderBy("balance", "desc")
-      .limit(10)
-      .get();
-    let rank = 1;
-    querySnapshot.forEach(doc => {
-      const data = doc.data();
-      const tr = document.createElement("tr");
-      tr.innerHTML = `<td>${rank}</td><td>${data.username || "Anonymous"}</td><td>${data.balance || 0}</td>`;
-      leaderboardBody.appendChild(tr);
-      rank++;
-    });
+    const bal = await loadUserBalance(currentUser.uid);
+    userBalance.textContent = bal;
   }
 
   async function claimDailyReward() {
     const userRef = db.collection("users").doc(currentUser.uid);
     const doc = await userRef.get();
-    const lastClaim = doc.data().lastDaily;
-    const now = Date.now();
-    if (lastClaim && now - lastClaim < 86400000) {
-      alert("You already claimed your daily reward.");
-      return;
-    }
-    await userRef.update({
-      balance: firebase.firestore.FieldValue.increment(10),
-      lastDaily: now
-    });
-    alert("You claimed 10 RBX!");
-    updateBalance();
-  }
+    const data = doc.data();
+    const lastClaim = data.lastDailyReward ? data.lastDailyReward.toDate() : null;
+    const now = new Date();
 
-  function setupOfferwall(uid, email) {
-    const hash = CryptoJS.MD5(uid + '-' + cpxSecret).toString();
-    const src = `https://offers.cpx-research.com/index.php?app_id=${cpxAppId}&ext_user_id=${uid}&secure_hash=${hash}&username=${encodeURIComponent(email)}&email=${encodeURIComponent(email)}`;
-    cpxIframe.src = src;
-  }
-
-  async function handleReferral(newUserId) {
-    if (!referrerUid || referrerUid === newUserId) return;
-    const referrerRef = db.collection("users").doc(referrerUid);
-    const refDoc = await referrerRef.get();
-    if (refDoc.exists) {
-      await referrerRef.update({
-        balance: firebase.firestore.FieldValue.increment(5)
+    if (!lastClaim || now - lastClaim > 86400000) {
+      await userRef.update({
+        balance: (data.balance || 0) + 5,
+        lastDailyReward: firebase.firestore.Timestamp.now()
       });
+      alert("You received 5 RBX for your daily reward!");
+      updateBalance();
+    } else {
+      alert("You already claimed your daily reward today.");
     }
+  }
+
+  function openCpxOfferwall() {
+    const uid = currentUser.uid;
+    const username = currentUser.email.split('@')[0];
+    const email = currentUser.email;
+    const hash = CryptoJS.MD5(uid + '-' + cpxSecret).toString();
+    const url = `https://offers.cpx-research.com/index.php?app_id=${cpxAppId}&ext_user_id=${uid}&secure_hash=${hash}&username=${encodeURIComponent(username)}&email=${encodeURIComponent(email)}`;
+    window.open(url, '_blank');
+  }
+
+  async function loadLeaderboard() {
+    const topUsers = await db.collection("users")
+      .orderBy("balance", "desc")
+      .limit(10).get();
+
+    leaderboardBody.innerHTML = "";
+    let rank = 1;
+    topUsers.forEach(doc => {
+      const data = doc.data();
+      leaderboardBody.innerHTML += `
+        <tr>
+          <td>${rank++}</td>
+          <td>${data.username || doc.id}</td>
+          <td>${data.balance || 0}</td>
+        </tr>`;
+    });
+  }
+
+  function showDashboard() {
+    authSection.style.display = "none";
+    dashboard.style.display = "block";
+    leaderboard.style.display = "block";
+    logoutBtn.style.display = "inline-block";
+  }
+
+  function showAuth() {
+    authSection.style.display = "block";
+    dashboard.style.display = "none";
+    leaderboard.style.display = "none";
+    logoutBtn.style.display = "none";
   }
 
   loginBtn.onclick = async () => {
+    clearError();
     try {
-      const userCred = await auth.signInWithEmailAndPassword(emailInput.value, passwordInput.value);
+      await auth.signInWithEmailAndPassword(emailInput.value, passwordInput.value);
     } catch (e) {
       showError(e.message);
     }
   };
 
   registerBtn.onclick = async () => {
+    clearError();
     try {
-      const userCred = await auth.createUserWithEmailAndPassword(emailInput.value, passwordInput.value);
-      await db.collection("users").doc(userCred.user.uid).set({
-        username: emailInput.value.split("@")[0],
+      const cred = await auth.createUserWithEmailAndPassword(emailInput.value, passwordInput.value);
+      await db.collection("users").doc(cred.user.uid).set({
+        username: emailInput.value.split('@')[0],
         balance: 0,
-        lastDaily: null
+        lastDailyReward: null
       });
-      await handleReferral(userCred.user.uid);
     } catch (e) {
       showError(e.message);
     }
@@ -310,28 +330,19 @@
 
   logoutBtn.onclick = () => auth.signOut();
   refreshBalanceBtn.onclick = updateBalance;
-  dailyBtn.onclick = claimDailyReward;
+  dailyRewardBtn.onclick = claimDailyReward;
+  openCpxBtn.onclick = openCpxOfferwall;
 
   auth.onAuthStateChanged(async user => {
     if (user) {
       currentUser = user;
-      document.getElementById("auth-section").style.display = "none";
-      document.getElementById("dashboard").style.display = "block";
-      document.getElementById("leaderboard").style.display = "block";
-      document.getElementById("offerwalls").style.display = "block";
-      logoutBtn.style.display = "inline-block";
-      usernameDisplay.textContent = user.email.split("@")[0];
-      referralLink.textContent = `${location.origin}?ref=${user.uid}`;
+      usernameDisplay.textContent = user.email.split('@')[0];
+      showDashboard();
       await updateBalance();
       await loadLeaderboard();
-      setupOfferwall(user.uid, user.email);
     } else {
       currentUser = null;
-      document.getElementById("auth-section").style.display = "block";
-      document.getElementById("dashboard").style.display = "none";
-      document.getElementById("leaderboard").style.display = "none";
-      document.getElementById("offerwalls").style.display = "none";
-      logoutBtn.style.display = "none";
+      showAuth();
     }
   });
 </script>
