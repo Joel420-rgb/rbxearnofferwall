@@ -1,388 +1,173 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>RBX Earn Offerwall</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RBX Earn</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #00ff88;
+      background-image: url('https://i.imgur.com/sYHjbDe.png');
+      background-repeat: no-repeat;
+      background-size: 200px;
+      background-position: top right;
+    }
+    header {
+      background-color: #000;
+      color: #fff;
+      padding: 1rem;
+      text-align: center;
+      font-size: 1.5rem;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 2rem auto;
+      padding: 1rem;
+      background-color: #ffffffcc;
+      border-radius: 1rem;
+    }
+    iframe {
+      border: none;
+      width: 100%;
+      height: 2000px;
+      border-radius: 0.5rem;
+    }
+    .balance, .leaderboard, .referrals {
+      margin-bottom: 2rem;
+    }
+    .image-row {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 2rem;
+    }
+    .image-row img {
+      width: 120px;
+    }
+  </style>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
 
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
-  body {
-    font-family: 'Orbitron', monospace, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #00ff00, #005500);
-    color: #00ff00;
-    margin: 0; padding: 0;
-  }
-  header {
-    background: #003300;
-    padding: 15px 20px;
-    text-align: center;
-    font-size: 2rem;
-    font-weight: bold;
-    letter-spacing: 3px;
-    color: #00ff00;
-    position: relative;
-    text-shadow: 0 0 10px #00ff00;
-  }
-  #logout-btn {
-    position: absolute;
-    right: 20px;
-    top: 15px;
-    background: #00aa00;
-    border: none;
-    padding: 8px 15px;
-    font-weight: bold;
-    border-radius: 8px;
-    cursor: pointer;
-    color: #003300;
-    display: none;
-    box-shadow: 0 0 8px #00ff00;
-  }
-  #logout-btn:hover {
-    background: #00ff00;
-    color: #003300;
-    box-shadow: 0 0 20px #00ff00;
-  }
-  main {
-    max-width: 900px;
-    margin: 30px auto;
-    background: #002200cc;
-    border-radius: 16px;
-    padding: 25px;
-    box-shadow: 0 0 30px #00ff00;
-  }
-  section {
-    margin-bottom: 35px;
-  }
-  h2 {
-    border-bottom: 3px solid #00ff00;
-    padding-bottom: 10px;
-    text-shadow: 0 0 6px #00ff00;
-  }
-  input[type="email"],
-  input[type="password"] {
-    padding: 12px;
-    border-radius: 10px;
-    border: none;
-    width: 100%;
-    max-width: 350px;
-    margin-top: 12px;
-    margin-bottom: 18px;
-    background: #003300;
-    color: #00ff00;
-    font-weight: bold;
-    box-shadow: 0 0 6px #00ff00 inset;
-  }
-  input::placeholder {
-    color: #66ff66;
-  }
-  button {
-    background: #00ff00;
-    border: none;
-    border-radius: 10px;
-    padding: 12px 28px;
-    font-weight: bold;
-    cursor: pointer;
-    color: #003300;
-    font-size: 1rem;
-    margin-right: 10px;
-    box-shadow: 0 0 10px #00ff00;
-    transition: all 0.3s ease;
-  }
-  button:hover {
-    background: #66ff66;
-    color: #003300;
-    box-shadow: 0 0 25px #00ff00;
-  }
-  #dashboard, #leaderboard, #offerwalls {
-    display: none;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-    color: #00ff00;
-  }
-  table, th, td {
-    border: 1px solid #00ff00;
-  }
-  th, td {
-    padding: 12px;
-    text-align: center;
-  }
-  #offerwalls iframe {
-    width: 100%;
-    height: 700px;
-    border: none;
-    border-radius: 16px;
-    box-shadow: 0 0 25px #00ff00;
-  }
-  .flex-row {
-    display: flex;
-    align-items: center;
-    gap: 18px;
-  }
-  .image-small {
-    height: 60px;
-    filter: drop-shadow(0 0 6px #00ff00);
-  }
-  #error-msg {
-    color: #ff4444;
-    font-weight: bold;
-    margin-top: 10px;
-    text-shadow: none;
-  }
-  footer {
-    text-align: center;
-    color: #00ff00aa;
-    margin: 30px 0 10px 0;
-    font-size: 0.9rem;
-    text-shadow: 0 0 3px #00ff00;
-  }
-</style>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBPzy5gI_8pYNAf6MfPAhynXFUQmoIyX0Q",
+      authDomain: "offerwall-a1633.firebaseapp.com",
+      projectId: "offerwall-a1633",
+      storageBucket: "offerwall-a1633.appspot.com",
+      messagingSenderId: "1028983595144",
+      appId: "1:1028983595144:web:6e57a9663cb8a52cadff3d"
+    };
 
-<!-- Firebase compat SDKs -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth();
+    const db = getFirestore(app);
 
-<!-- CryptoJS for MD5 hashing -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    const provider = new GoogleAuthProvider();
 
+    async function signIn() {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      const userRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userRef);
+
+      if (!userSnap.exists()) {
+        await setDoc(userRef, {
+          email: user.email,
+          username: user.displayName,
+          balance: 0
+        });
+      }
+      showDashboard(user);
+    }
+
+    function showDashboard(user) {
+      document.getElementById("auth").style.display = "none";
+      document.getElementById("dashboard").style.display = "block";
+      document.getElementById("iframe-cpx").src = `https://offers.cpx-research.com/index.php?app_id=27501&ext_user_id=${user.uid}&secure_hash=${md5(user.uid + '-Fw6OCES5xait8uFo59OukB2M5aENR2Qj')}&username=${user.displayName}&email=${user.email}`;
+      document.getElementById("referral-link").textContent = `${window.location.origin}/?ref=${user.uid}`;
+    }
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        showDashboard(user);
+      }
+    });
+
+    window.signIn = signIn;
+
+    function md5(string) {
+      return CryptoJS.MD5(string).toString();
+    }
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 </head>
 <body>
-
-<header>
-  RBX Earn Offerwall
-  <button id="logout-btn" title="Logout">Logout</button>
-</header>
-
-<main>
-  <!-- Authentication Section -->
-  <section id="auth-section">
-    <h2>Login or Register</h2>
-    <input id="email" type="email" placeholder="Email" required />
-    <input id="password" type="password" placeholder="Password" required />
-    <div>
-      <button id="login-btn">Login</button>
-      <button id="register-btn">Register</button>
+  <header>RBX EARN</header>
+  <div class="container">
+    <div id="auth" style="text-align: center">
+      <h2>Login to Start Earning Robux</h2>
+      <button onclick="signIn()">Sign in with Google</button>
     </div>
-    <div id="error-msg"></div>
-  </section>
 
-  <!-- Dashboard -->
-  <section id="dashboard">
-    <h2>Welcome, <span id="username-display"></span>!</h2>
-    <div class="flex-row" style="justify-content: center; margin-bottom: 20px;">
-      <img src="https://i.imgur.com/7B7dLvq.png" alt="Robux" class="image-small" />
-      <img src="https://i.imgur.com/ev9gqJK.png" alt="Cash" class="image-small" />
+    <div id="dashboard" style="display: none;">
+      <div class="image-row">
+        <img src="https://i.imgur.com/3qYOazH.png" alt="robux" />
+        <img src="https://i.imgur.com/WvXzXkX.png" alt="cash" />
+      </div>
+
+      <div class="balance">
+        <h3>Your Balance: <span id="balance">Loading...</span> RBX</h3>
+      </div>
+
+      <div class="offerwall">
+        <h3>Complete Offers</h3>
+        <iframe id="iframe-cpx"></iframe>
+      </div>
+
+      <div class="leaderboard">
+        <h3>Leaderboard</h3>
+        <ul id="leaderboard-list"></ul>
+      </div>
+
+      <div class="referrals">
+        <h3>Referral Link</h3>
+        <p>Share this link: <code id="referral-link"></code></p>
+      </div>
     </div>
-    <p><strong>Your Balance:</strong> <span id="user-balance">0</span> RBX</p>
-    <button id="refresh-balance-btn">Refresh Balance</button>
-  </section>
+  </div>
+</body>
+</html>
 
-  <!-- Leaderboard -->
-  <section id="leaderboard">
-    <h2>Leaderboard</h2>
-    <table>
-      <thead>
-        <tr><th>Rank</th><th>User</th><th>Balance</th></tr>
-      </thead>
-      <tbody id="leaderboard-body">
-        <!-- Filled dynamically -->
-      </tbody>
-    </table>
-  </section>
+<!-- BACKEND POSTBACK EXAMPLE (Node.js) -->
+// File: /api/postback.js (for Vercel or Firebase Functions)
+/*
+export default async function handler(req, res) {
+  const admin = await import("firebase-admin");
 
-  <!-- Offerwalls -->
-  <section id="offerwalls">
-    <h2>Offerwalls</h2>
-    <iframe id="cpx-iframe" src="" frameborder="0"></iframe>
-  </section>
-</main>
-
-<footer>© 2025 RBX Earn Offerwall</footer>
-
-<script>
-  // Your Firebase config from your message
-  const firebaseConfig = {
-    apiKey: "AIzaSyBPzy5gI_8pYNAf6MfPAhynXFUQmoIyX0Q",
-    authDomain: "offerwall-a1633.firebaseapp.com",
-    projectId: "offerwall-a1633",
-    storageBucket: "offerwall-a1633.firebasestorage.app",
-    messagingSenderId: "1028983595144",
-    appId: "1:1028983595144:web:6e57a9663cb8a52cadff3d"
-  };
-
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-
-  const auth = firebase.auth();
-  const db = firebase.firestore();
-
-  // DOM Elements
-  const loginBtn = document.getElementById('login-btn');
-  const registerBtn = document.getElementById('register-btn');
-  const logoutBtn = document.getElementById('logout-btn');
-  const emailInput = document.getElementById('email');
-  const passwordInput = document.getElementById('password');
-  const errorMsg = document.getElementById('error-msg');
-
-  const authSection = document.getElementById('auth-section');
-  const dashboardSection = document.getElementById('dashboard');
-  const leaderboardSection = document.getElementById('leaderboard');
-  const offerwallsSection = document.getElementById('offerwalls');
-
-  const usernameDisplay = document.getElementById('username-display');
-  const userBalanceSpan = document.getElementById('user-balance');
-  const leaderboardBody = document.getElementById('leaderboard-body');
-  const cpxIframe = document.getElementById('cpx-iframe');
-
-  const refreshBalanceBtn = document.getElementById('refresh-balance-btn');
-
-  // CPX info
-  const cpxAppId = "27501";
-  const cpxSecret = "Fw6OCES5xait8uFo59OukB2M5aENR2Qj";
-
-  let currentUser = null;
-
-  // Show error
-  function showError(message) {
-    errorMsg.textContent = message;
-  }
-
-  // Clear error
-  function clearError() {
-    errorMsg.textContent = '';
-  }
-
-  // Setup CPX iframe URL with MD5 hash
-  function setupOfferwall(userId, username, email) {
-    const hash = CryptoJS.MD5(userId + '-' + cpxSecret).toString();
-    const src = `https://offers.cpx-research.com/index.php?app_id=${cpxAppId}&ext_user_id=${userId}&secure_hash=${hash}&username=${encodeURIComponent(username)}&email=${encodeURIComponent(email)}&subid_1=&subid_2=`;
-    cpxIframe.src = src;
-  }
-
-  // Load user balance from Firestore (or create user doc if not exists)
-  async function loadUserBalance(uid) {
-    const docRef = db.collection('users').doc(uid);
-    const doc = await docRef.get();
-    if (!doc.exists) {
-      await docRef.set({ balance: 0, username: currentUser.email.split('@')[0] });
-      return 0;
-    } else {
-      return doc.data().balance || 0;
-    }
-  }
-
-  // Update user balance display
-  async function updateBalance() {
-    if (!currentUser) return;
-    const balance = await loadUserBalance(currentUser.uid);
-    userBalanceSpan.textContent = balance;
-  }
-
-  // Load and display leaderboard (top 10 by balance)
-  async function loadLeaderboard() {
-    leaderboardBody.innerHTML = '';
-    const querySnapshot = await db.collection('users')
-      .orderBy('balance', 'desc')
-      .limit(10)
-      .get();
-
-    let rank = 1;
-    querySnapshot.forEach(doc => {
-      const data = doc.data();
-      const username = data.username || doc.id;
-      const balance = data.balance || 0;
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${rank}</td><td>${username}</td><td>${balance}</td>`;
-      leaderboardBody.appendChild(tr);
-      rank++;
+  if (!admin.apps.length) {
+    admin.initializeApp({
+      credential: admin.credential.cert({
+        projectId: "offerwall-a1633",
+        clientEmail: "YOUR_FIREBASE_ADMIN_EMAIL",
+        privateKey: "YOUR_FIREBASE_PRIVATE_KEY".replace(/\\n/g, '\n')
+      })
     });
   }
 
-  // Show sections after login
-  function showDashboard() {
-    authSection.style.display = 'none';
-    dashboardSection.style.display = 'block';
-    leaderboardSection.style.display = 'block';
-    offerwallsSection.style.display = 'block';
-    logoutBtn.style.display = 'inline-block';
-  }
+  const db = admin.firestore();
+  const { user_id, amount, hash } = req.query;
+  const expectedHash = require("crypto").createHash("md5").update(user_id + "-Fw6OCES5xait8uFo59OukB2M5aENR2Qj").digest("hex");
 
-  // Hide sections on logout
-  function showAuth() {
-    authSection.style.display = 'block';
-    dashboardSection.style.display = 'none';
-    leaderboardSection.style.display = 'none';
-    offerwallsSection.style.display = 'none';
-    logoutBtn.style.display = 'none';
-    emailInput.value = '';
-    passwordInput.value = '';
-  }
+  if (hash !== expectedHash) return res.status(403).send("Invalid hash");
 
-  // On login
-  loginBtn.addEventListener('click', async () => {
-    clearError();
-    const email = emailInput.value.trim();
-    const password = passwordInput.value;
-    if (!email || !password) {
-      showError('Please enter email and password.');
-      return;
-    }
-    try {
-      await auth.signInWithEmailAndPassword(email, password);
-    } catch (error) {
-      showError(error.message);
-    }
+  await db.collection("users").doc(user_id).update({
+    balance: admin.firestore.FieldValue.increment(parseInt(amount))
   });
 
-  // On register
-  registerBtn.addEventListener('click', async () => {
-    clearError();
-    const email = emailInput.value.trim();
-    const password = passwordInput.value;
-    if (!email || !password) {
-      showError('Please enter email and password.');
-      return;
-    }
-    try {
-      const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-      // Add user to Firestore with initial balance
-      await db.collection('users').doc(userCredential.user.uid).set({
-        username: email.split('@')[0],
-        balance: 0,
-      });
-    } catch (error) {
-      showError(error.message);
-    }
-  });
-
-  // On logout
-  logoutBtn.addEventListener('click', async () => {
-    await auth.signOut();
-  });
-
-  // Refresh balance button
-  refreshBalanceBtn.addEventListener('click', updateBalance);
-
-  // Monitor auth state changes
-  auth.onAuthStateChanged(async (user) => {
-    if (user) {
-      currentUser = user;
-      usernameDisplay.textContent = user.email.split('@')[0];
-      showDashboard();
-      await updateBalance();
-      await loadLeaderboard();
-      setupOfferwall(user.uid, user.email.split('@')[0], user.email);
-    } else {
-      currentUser = null;
-      showAuth();
-      cpxIframe.src = '';
-    }
-  });
-</script>
-
-</body>
-</html>
+  res.status(200).send("Balance updated");
+}
+*/
+// Set this as your CPX postback URL:
+// https://your-app-url.vercel.app/api/postback?user_id=UID&amount=AMOUNT&hash=SECURE_HASH
