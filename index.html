@@ -1,153 +1,166 @@
-// App.jsx
-import React, { useState, useEffect } from "react";
-import { initializeApp } from "firebase/app";
-import {
-  getAuth,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  onAuthStateChanged,
-  signOut,
-} from "firebase/auth";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RBX Earner</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      background: #00ff00;
+      background-size: cover;
+      color: black;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      padding: 2rem;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 0 20px black;
+      text-align: center;
+    }
+    input, button {
+      padding: 0.8rem;
+      margin: 0.5rem;
+      border-radius: 10px;
+      border: none;
+    }
+    iframe {
+      margin-top: 20px;
+      border: none;
+      width: 100%;
+      height: 2000px;
+    }
+    .animated-img {
+      width: 100px;
+      animation: float 2s infinite ease-in-out;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="auth-container">
+    <h2>Login to Earn Robux</h2>
+    <input type="email" id="email" placeholder="Email" /><br />
+    <input type="password" id="password" placeholder="Password" /><br />
+    <button onclick="login()">Login</button>
+    <button onclick="register()">Register</button><br/>
+    <img src="https://www.pngmart.com/files/13/Robux-PNG-Image.png" class="animated-img" />
+  </div>
 
-// Firebase config (your keys)
-const firebaseConfig = {
-  apiKey: "AIzaSyBPzy5gI_8pYNAf6MfPAhynXFUQmoIyX0Q",
-  authDomain: "offerwall-a1633.firebaseapp.com",
-  projectId: "offerwall-a1633",
-  storageBucket: "offerwall-a1633.firebasestorage.app",
-  messagingSenderId: "1028983595144",
-  appId: "1:1028983595144:web:6e57a9663cb8a52cadff3d",
-};
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+  <div class="container" id="dashboard" style="display: none;">
+    <h2>Welcome, <span id="username"></span></h2>
+    <p>Balance: <span id="balance">0</span> RBX</p>
+    <p>Your Referral Link: <span id="refLink"></span></p>
 
-export default function App() {
-  const [user, setUser] = useState(null);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+    <iframe id="cpx-frame" src=""></iframe>
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (u) => {
-      setUser(u);
-      setError("");
+    <h3>Leaderboard (Coming Soon)</h3>
+    <ul>
+      <li>User1 - 1000 RBX</li>
+      <li>User2 - 800 RBX</li>
+    </ul>
+
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import {
+      getAuth,
+      signInWithEmailAndPassword,
+      createUserWithEmailAndPassword,
+      onAuthStateChanged,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    import {
+      getFirestore,
+      doc,
+      getDoc,
+      setDoc,
+      updateDoc
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBPzy5gI_8pYNAf6MfPAhynXFUQmoIyX0Q",
+      authDomain: "offerwall-a1633.firebaseapp.com",
+      projectId: "offerwall-a1633",
+      storageBucket: "offerwall-a1633.appspot.com",
+      messagingSenderId: "1028983595144",
+      appId: "1:1028983595144:web:6e57a9663cb8a52cadff3d"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const login = async () => {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+      } catch (error) {
+        alert(error.message);
+      }
+    };
+
+    const register = async () => {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const uid = userCredential.user.uid;
+        await setDoc(doc(db, "users", uid), {
+          email,
+          balance: 0,
+          ref: ""
+        });
+      } catch (error) {
+        alert(error.message);
+      }
+    };
+
+    const logout = async () => {
+      await signOut(auth);
+    };
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        document.getElementById("auth-container").style.display = "none";
+        document.getElementById("dashboard").style.display = "block";
+        document.getElementById("username").textContent = user.email;
+
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        const data = userDoc.data();
+        document.getElementById("balance").textContent = data.balance ?? 0;
+
+        const cpxKey = "Fw6OCES5xait8uFo59OukB2M5aENR2Qj";
+        const hash = md5(`${user.uid}-${cpxKey}`);
+        const offerURL = `https://offers.cpx-research.com/index.php?app_id=27501&ext_user_id=${user.uid}&secure_hash=${hash}&username=${user.email}&email=${user.email}`;
+        document.getElementById("cpx-frame").src = offerURL;
+
+        document.getElementById("refLink").textContent = `${window.location.origin}?ref=${user.uid}`;
+      } else {
+        document.getElementById("auth-container").style.display = "block";
+        document.getElementById("dashboard").style.display = "none";
+      }
     });
-    return unsubscribe;
-  }, []);
 
-  const handleLogin = async () => {
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-    } catch (e) {
-      setError(e.message);
+    // Simple MD5 hash function (for demonstration)
+    function md5(string) {
+      return CryptoJS.MD5(string).toString();
     }
-  };
-
-  const handleRegister = async () => {
-    try {
-      await createUserWithEmailAndPassword(auth, email, password);
-    } catch (e) {
-      setError(e.message);
-    }
-  };
-
-  const handleLogout = async () => {
-    await signOut(auth);
-  };
-
-  if (!user) {
-    return (
-      <div style={styles.container}>
-        <h2>Login or Register</h2>
-        <input
-          style={styles.input}
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <input
-          style={styles.input}
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <button style={styles.button} onClick={handleLogin}>
-          Login
-        </button>
-        <button style={styles.button} onClick={handleRegister}>
-          Register
-        </button>
-        {error && <p style={{ color: "red" }}>{error}</p>}
-      </div>
-    );
-  }
-
-  // User logged in, show dashboard with offerwall iframe
-  const uniqueUserId = user.uid;
-  const userName = encodeURIComponent(user.email || "");
-  const userEmail = encodeURIComponent(user.email || "");
-
-  return (
-    <div style={{ ...styles.container, backgroundColor: "#39FF14", minHeight: "100vh" }}>
-      <h1>Welcome, {user.email}</h1>
-      <button style={{ ...styles.button, backgroundColor: "#222" }} onClick={handleLogout}>
-        Logout
-      </button>
-      <h2>Your CPX Offerwall</h2>
-      <iframe
-        title="CPX Offerwall"
-        width="100%"
-        height="700"
-        frameBorder="0"
-        src={`https://offers.cpx-research.com/index.php?app_id=27501&ext_user_id=${uniqueUserId}&secure_hash=27501&username=${userName}&email=${userEmail}&subid_1=&subid_2=`}
-        style={{ borderRadius: "8px", marginTop: "20px" }}
-      />
-      <div style={{ marginTop: 40 }}>
-        <img
-          src="https://cdn-icons-png.flaticon.com/512/196/196566.png"
-          alt="Robux"
-          style={{ width: 100, marginRight: 20 }}
-        />
-        <img
-          src="https://cdn-icons-png.flaticon.com/512/2331/2331836.png"
-          alt="Cash"
-          style={{ width: 100 }}
-        />
-      </div>
-    </div>
-  );
-}
-
-const styles = {
-  container: {
-    maxWidth: 480,
-    margin: "auto",
-    padding: 20,
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-  },
-  input: {
-    width: "100%",
-    padding: 10,
-    margin: "8px 0",
-    borderRadius: 5,
-    border: "1px solid #ccc",
-    fontSize: 16,
-  },
-  button: {
-    width: "100%",
-    padding: 12,
-    margin: "8px 0",
-    borderRadius: 5,
-    border: "none",
-    backgroundColor: "#222",
-    color: "white",
-    fontWeight: "bold",
-    cursor: "pointer",
-  },
-};
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+</body>
+</html>
